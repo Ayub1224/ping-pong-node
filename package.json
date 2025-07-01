@@ -1,0 +1,14 @@
+{
+    "name": "pingpong-lambda",
+    "version": "1.0.0",
+    "description": "Simple AWS Lambda function that returns pong",
+    "main": "index.js",
+    "scripts": {
+      "zip": "zip -r function.zip index.js package.json",
+      "clean": "rm -f function.zip",
+      "build": "npm run clean && npm run zip"
+    },
+    "author": "Ayub Khan",
+    "license": "MIT"
+  }
+  
