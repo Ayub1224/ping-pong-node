@@ -1,7 +1,29 @@
 exports.handler = async (event) => {
   console.log(event);
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: "hello from Ayub" }),
-  };
+const httpMethod = event.httpMethod;
+const path = event.path || '/';
+
+switch (path){
+
+    case '/ping': 
+    return {
+        statusCode: 200,
+        body: JSON.stringify({
+            message: 'Pong',
+            status: 'success',
+            timestamp: new Date().toISOString(),
+        })
+    }
+   
+    case '/': 
+    default:
+    return {
+        statusCode: 200,
+        body: JSON.stringify({
+            message:'hello from Ayub',
+            status: 'success',
+        timestamp: new Date().toISOString(),
+        })
+    }
+}
 };

@@ -6,7 +6,8 @@
     "scripts": {
       "zip": "zip -r function.zip index.js package.json",
       "clean": "rm -f function.zip",
-      "build": "npm run clean && npm run zip"
+      "build": "npm run clean && npm run zip",
+      "test": "node test-endpoints.js"
     },
     "author": "Ayub Khan",
     "license": "MIT"
