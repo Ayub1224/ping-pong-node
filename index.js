@@ -2,6 +2,6 @@ exports.handler = async (event) => {
   console.log(event);
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: "Ping-pong pong-ping" }),
+    body: JSON.stringify({ message: "hello from Ayub" }),
   };
 };
