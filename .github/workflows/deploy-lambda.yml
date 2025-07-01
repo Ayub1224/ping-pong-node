@@ -39,13 +39,6 @@ jobs:
           --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
           --zip-file fileb://function.zip
           
-    - name: Update Lambda configuration
-      run: |
-        aws lambda update-function-configuration \
-          --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
-          --handler ${{ secrets.LAMBDA_HANDLER }} \
-          --runtime nodejs18.x
-          
     - name: Verify deployment
       run: |
         aws lambda get-function \
