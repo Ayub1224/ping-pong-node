@@ -3,7 +3,24 @@ const https = require('https');
 // Helper function to make HTTPS requests
 const fetchData = (url) => {
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
+    console.log('Making HTTPS request to:', url);
+    
+    const options = {
+      timeout: 10000, // 10 second timeout
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; AMFI-API-Test/1.0)'
+      }
+    };
+    
+    https.get(url, options, (res) => {
+      console.log('Response status:', res.statusCode);
+      console.log('Response headers:', res.headers);
+      
+      if (res.statusCode !== 200) {
+        reject(new Error(`HTTP ${res.statusCode}: ${res.statusMessage}`));
+        return;
+      }
+      
       let data = '';
       
       res.on('data', (chunk) => {
@@ -11,10 +28,15 @@ const fetchData = (url) => {
       });
       
       res.on('end', () => {
+        console.log('Data received successfully, length:', data.length);
         resolve(data);
       });
     }).on('error', (err) => {
+      console.error('HTTPS request error:', err);
       reject(err);
+    }).on('timeout', () => {
+      console.error('Request timeout');
+      reject(new Error('Request timeout'));
     });
   });
 };
@@ -43,10 +65,28 @@ exports.handler = async (event) => {
         })
       };
 
+    case '/test-amfi':
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: 'AMFI Test Endpoint',
+          data: {
+            testUrl: 'https://www.amfiindia.com/spages/NAVAll.txt',
+            note: 'This endpoint tests AMFI connectivity without parsing',
+            timestamp: new Date().toISOString()
+          }
+        })
+      };
+
     case '/amfi/nav/latest':
       try {
+        console.log('Starting AMFI NAV fetch...');
         const navUrl = 'https://www.amfiindia.com/spages/NAVAll.txt';
+        console.log('Fetching from:', navUrl);
+        
         const navData = await fetchData(navUrl);
+        console.log('Data received, length:', navData.length);
+        console.log('First 200 characters:', navData.substring(0, 200));
         
         // Simple parsing - just get first few lines
         const lines = navData.split('\n').slice(0, 5);
@@ -59,6 +99,8 @@ exports.handler = async (event) => {
             nav: parts[4] || 'N/A'
           };
         });
+        
+        console.log('Parsed sample data:', sampleData);
         
         return {
           statusCode: 200,
@@ -75,11 +117,16 @@ exports.handler = async (event) => {
           })
         };
       } catch (error) {
+        console.error('AMFI API Error:', error);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        
         return {
           statusCode: 500,
           body: JSON.stringify({
             message: 'Error fetching NAV data',
             error: error.message,
+            errorType: error.constructor.name,
             timestamp: new Date().toISOString()
           })
         };
