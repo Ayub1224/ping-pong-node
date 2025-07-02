@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
       "zip": "zip -r function.zip index.js package.json",
-      "clean": "rm -f function.zip",
+      "clean": "rm -f function.zip node_modules package-lock.json",
       "build": "npm run clean && npm run zip",
       "test": "node test-endpoints.js"
     },
