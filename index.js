@@ -65,66 +65,43 @@ exports.handler = async (event) => {
         })
       };
 
-    case '/test-amfi':
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          message: 'AMFI Test Endpoint',
-          data: {
-            testUrl: 'https://www.amfiindia.com/spages/NAVAll.txt',
-            note: 'This endpoint tests AMFI connectivity without parsing',
-            timestamp: new Date().toISOString()
-          }
-        })
-      };
-
-    case '/amfi/nav/latest':
+      case '/amfi/nav/latest':
       try {
         console.log('Starting AMFI NAV fetch...');
-        const navUrl = 'https://www.amfiindia.com/spages/NAVAll.txt';
+        // Use a smaller endpoint or just get basic info
+        const navUrl = 'https://www.amfiindia.com/';
         console.log('Fetching from:', navUrl);
         
         const navData = await fetchData(navUrl);
         console.log('Data received, length:', navData.length);
-        console.log('First 200 characters:', navData.substring(0, 200));
         
-        // Simple parsing - just get first few lines
-        const lines = navData.split('\n').slice(0, 5);
-        const sampleData = lines.map(line => {
-          const parts = line.split(';');
-          return {
-            raw: line,
-            parts: parts.length,
-            schemeName: parts[3] || 'N/A',
-            nav: parts[4] || 'N/A'
-          };
-        });
+        // Just get basic info about the response
+        const basicInfo = {
+          source: 'AMFI India',
+          dataLength: navData.length,
+          hasData: navData.length > 0,
+          firstLine: navData.split('\n')[0]?.substring(0, 100) || 'No data',
+          lastUpdated: new Date().toISOString()
+        };
         
-        console.log('Parsed sample data:', sampleData);
+        console.log('Basic info:', basicInfo);
         
         return {
           statusCode: 200,
           body: JSON.stringify({
-            message: 'Latest NAV from AMFI',
-            data: {
-              source: 'AMFI India',
-              totalLines: navData.split('\n').length,
-              sampleData: sampleData,
-              api_endpoint: navUrl,
-              lastUpdated: new Date().toISOString()
-            },
+            message: 'AMFI Connection Test',
+            data: basicInfo,
             timestamp: new Date().toISOString()
           })
         };
       } catch (error) {
         console.error('AMFI API Error:', error);
         console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
         
         return {
           statusCode: 500,
           body: JSON.stringify({
-            message: 'Error fetching NAV data',
+            message: 'Error connecting to AMFI',
             error: error.message,
             errorType: error.constructor.name,
             timestamp: new Date().toISOString()
@@ -132,27 +109,11 @@ exports.handler = async (event) => {
         };
       }
 
-    case '/':
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          message: 'hello from Ayub',
-          status: 'success',
-          amfi_integration: 'Available with Real Data',
-          endpoints: {
-            health: '/health',
-            ping: '/ping',
-            amfi_latest_nav: '/amfi/nav/latest'
-          },
-          timestamp: new Date().toISOString(),
-        })
-      };
-
     default:
       return {
         statusCode: 404,
         body: JSON.stringify({
-          message: 'Not found',
+          message: 'Hey Welcome to AMFI API',
           requestedPath: path,
           availableEndpoints: [
             '/', 
